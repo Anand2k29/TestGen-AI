@@ -57,7 +57,7 @@ TestGen AI is a premium, high-density developer dashboard engineered to automati
 
 4. **Launch the development server**:
    ```bash
-   python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+   python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload
    ```
    Open `http://127.0.0.1:8000` in your web browser.
 
