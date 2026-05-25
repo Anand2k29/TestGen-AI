@@ -16,8 +16,26 @@ else:
 GEMINI_MODEL = "gemini-2.5-flash"
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
 
-OPENROUTER_MODEL = "meta-llama/llama-3-8b-instruct:free"
+OPENROUTER_MODEL = "qwen/qwen3-coder:free"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+
+SUPPORTED_OPENROUTER_MODELS = {
+    "qwen/qwen3-coder:free",
+    "baidu/cobuddy:free",
+    "openrouter/owl-alpha",
+    "deepseek/deepseek-v4-flash:free",
+    "openai/gpt-oss-120b:free",
+    "openai/gpt-oss-20b:free",
+    "google/gemma-4-26b-a4b-it:free",
+    "google/gemma-4-31b-it:free",
+    "meta-llama/llama-3.3-70b-instruct:free",
+    "meta-llama/llama-3.2-3b-instruct:free",
+    "poolside/laguna-xs.2:free",
+    "poolside/laguna-m.1:free",
+    "nvidia/nemotron-3-nano-30b-a3b:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
+    "qwen/qwen3-next-80b-a3b-instruct:free",
+}
 
 TEST_TYPE_LABELS = {
     "unit": "unit tests",
@@ -104,6 +122,12 @@ def _call_gemini(context: str, test_type: str) -> str:
 
 def _call_openrouter(context: str, test_type: str, model_name: str = "") -> str:
     prompt = _build_user_prompt(context, test_type)
+    requested_model = model_name.strip()
+    target_model = (
+        requested_model
+        if requested_model in SUPPORTED_OPENROUTER_MODELS
+        else OPENROUTER_MODEL
+    )
     headers = {
         "Authorization": f"Bearer {_get_required_env('OPENROUTER_API_KEY')}",
         "Content-Type": "application/json",
@@ -111,7 +135,7 @@ def _call_openrouter(context: str, test_type: str, model_name: str = "") -> str:
         "X-Title": "TestGen AI",
     }
     payload = {
-        "model": model_name.strip() or OPENROUTER_MODEL,
+        "model": target_model,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
