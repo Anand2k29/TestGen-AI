@@ -5,7 +5,10 @@ from dotenv import load_dotenv
 
 # Robustly load the local .env relative to the script, overriding any empty process vars
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
-load_dotenv(dotenv_path=dotenv_path, override=True)
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path=dotenv_path, override=True)
+else:
+    load_dotenv() # Fallback to standard environment variables (e.g. on Vercel)
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
