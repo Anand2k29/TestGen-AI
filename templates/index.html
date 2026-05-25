@@ -317,11 +317,11 @@ Requirements:
                             </textarea>
                         </div>
                         <!-- Drag & Drop Zone -->
+                        <input type="file" id="file-upload-input" accept=".txt,.json,.md,.yaml,.yml" class="hidden">
                         <div id="upload-dropzone" class="border-2 border-dashed border-outline-variant rounded p-6 flex flex-col items-center justify-center bg-surface-container-lowest hover:bg-surface-container transition-colors cursor-pointer group mt-2 relative">
                             <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors mb-2" style="font-size: 32px;">upload_file</span>
                             <p class="font-label-sm text-label-sm text-on-surface">Upload API Docs / Text Files</p>
                             <p class="font-code-md text-[10px] text-outline mt-1 text-center">Drag files here or click to browse. Max 10MB.</p>
-                            <input type="file" id="file-upload-input" accept=".txt,.json,.md,.yaml,.yml" class="hidden">
                         </div>
                         <!-- Generate Action -->
                         <div class="mt-2 flex justify-end">
@@ -887,10 +887,8 @@ OPENROUTER_API_KEY=sk-or-v1-...</pre>
         const uploadDropzone = document.getElementById('upload-dropzone');
         const fileUploadInput = document.getElementById('file-upload-input');
 
-        uploadDropzone.addEventListener('click', (e) => {
-            if (e.target !== fileUploadInput) {
-                fileUploadInput.click();
-            }
+        uploadDropzone.addEventListener('click', () => {
+            fileUploadInput.click();
         });
 
         function handleFile(file) {

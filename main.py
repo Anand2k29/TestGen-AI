@@ -1,3 +1,4 @@
+import os
 import time
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse
@@ -5,8 +6,10 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, ConfigDict
 from ai_service import generate_tests
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 app = FastAPI(title="TestGen AI")
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 
 class GenerateRequest(BaseModel):
