@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>AI Test Case Generation Agent - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#e0e2ea",
+                        "error": "#ffb4ab",
+                        "secondary-fixed-dim": "#67df70",
+                        "on-secondary-fixed-variant": "#005317",
+                        "outline-variant": "#414752",
+                        "background": "#101419",
+                        "on-primary": "#00315c",
+                        "on-primary-container": "#003a6b",
+                        "surface-bright": "#36393f",
+                        "on-surface": "#e0e2ea",
+                        "surface-variant": "#32353b",
+                        "on-secondary-fixed": "#002105",
+                        "tertiary-fixed-dim": "#ffba42",
+                        "surface-container-high": "#272a30",
+                        "inverse-primary": "#0060aa",
+                        "tertiary": "#ffba42",
+                        "surface-container-highest": "#32353b",
+                        "surface-tint": "#a2c9ff",
+                        "primary-fixed": "#d3e4ff",
+                        "on-surface-variant": "#c0c7d4",
+                        "surface-container-lowest": "#0b0e14",
+                        "inverse-on-surface": "#2d3136",
+                        "primary-container": "#58a6ff",
+                        "surface": "#101419",
+                        "on-tertiary-fixed": "#281800",
+                        "on-tertiary": "#432c00",
+                        "on-tertiary-container": "#4f3400",
+                        "surface-dim": "#101419",
+                        "on-secondary": "#00390d",
+                        "on-error-container": "#ffdad6",
+                        "on-background": "#e0e2ea",
+                        "primary-fixed-dim": "#a2c9ff",
+                        "on-error": "#690005",
+                        "on-secondary-container": "#00320a",
+                        "surface-container": "#1c2025",
+                        "primary": "#a2c9ff",
+                        "on-primary-fixed": "#001c38",
+                        "error-container": "#93000a",
+                        "secondary": "#67df70",
+                        "on-primary-fixed-variant": "#004882",
+                        "surface-container-low": "#181c21",
+                        "secondary-container": "#27a640",
+                        "secondary-fixed": "#83fc89",
+                        "tertiary-fixed": "#ffddaf",
+                        "tertiary-container": "#da9600",
+                        "on-tertiary-fixed-variant": "#614000",
+                        "outline": "#8b919d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "panel-padding": "12px",
+                        "container-margin": "0px",
+                        "gutter": "1px"
+                    },
+                    "fontFamily": {
+                        "headline-md": [
+                            "Inter"
+                        ],
+                        "label-sm": [
+                            "JetBrains Mono"
+                        ],
+                        "headline-lg": [
+                            "Inter"
+                        ],
+                        "body-md": [
+                            "Inter"
+                        ],
+                        "headline-lg-mobile": [
+                            "Inter"
+                        ],
+                        "code-md": [
+                            "JetBrains Mono"
+                        ]
+                    },
+                    "fontSize": {
+                        "headline-md": [
+                            "20px",
+                            {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                            }
+                        ],
+                        "label-sm": [
+                            "11px",
+                            {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.02em",
+                                "fontWeight": "500"
+                            }
+                        ],
+                        "headline-lg": [
+                            "24px",
+                            {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                            }
+                        ],
+                        "body-md": [
+                            "14px",
+                            {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                            }
+                        ],
+                        "headline-lg-mobile": [
+                            "20px",
+                            {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                            }
+                        ],
+                        "code-md": [
+                            "13px",
+                            {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                            }
+                        ]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for high-density terminal look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #101419;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #32353b;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #414752;
+        }
+
+        .code-lines::before {
+            counter-reset: line;
+        }
+
+        .line-number {
+            counter-increment: line;
+            display: inline-block;
+            width: 2rem;
+            text-align: right;
+            margin-right: 1rem;
+            color: #8b919d;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-background h-screen flex flex-col overflow-hidden font-body-md text-body-md">
+    <!-- TopNavBar -->
+    <nav
+        class="bg-surface-container dark:bg-surface-container docked full-width top-0 border-b border-outline-variant flat no shadows flex justify-between items-center h-12 px-panel-padding w-full flex-shrink-0 z-10">
+        <div class="flex items-center gap-4">
+            <div class="font-headline-md text-headline-md font-bold text-primary">TestGen AI</div>
+        </div>
+        <!-- Actions -->
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 border border-outline-variant rounded p-0.5 bg-surface-container-lowest">
+                <button id="btn-gemini"
+                    class="font-label-sm text-label-sm bg-primary-container text-white px-3 py-1 rounded hover:bg-opacity-90 transition-colors flex items-center gap-2">
+                    Gemini (Direct)
+                </button>
+                <button id="btn-openrouter"
+                    class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface px-3 py-1 rounded hover:bg-surface-variant transition-colors flex items-center gap-2">
+                    OpenRouter
+                </button>
+            </div>
+            
+            <!-- OpenRouter Model Dropdown -->
+            <div id="openrouter-model-container" class="hidden flex items-center gap-2 bg-surface-container border border-outline-variant rounded px-2 py-1">
+                <span class="font-label-sm text-[11px] text-outline uppercase tracking-wider">Model:</span>
+                <select id="openrouter-model-select" class="font-label-sm text-xs bg-[#101419] text-on-surface border border-outline-variant rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-primary w-64 cursor-pointer">
+                    <!-- Option categories and items populated here -->
+                </select>
+            </div>
+            
+            <button
+                class="text-on-surface-variant hover:bg-surface-variant transition-colors p-1 rounded cursor-pointer active:opacity-80 flex items-center justify-center">
+                <span class="material-symbols-outlined" style="font-size: 20px;">settings</span>
+            </button>
+        </div>
+    </nav>
+    <!-- Main Workspace -->
+    <div class="flex flex-1 overflow-hidden">
+        <!-- SideNavBar -->
+        <aside
+            class="bg-surface-container-low dark:bg-surface-container-low docked left-0 h-full w-16 border-r border-outline-variant flat no shadows flex flex-col items-center py-4 h-screen flex-shrink-0 z-10 justify-between">
+            <div class="flex flex-col gap-2 w-full">
+                <!-- Workspace Tab (Active) -->
+                <button id="btn-tab-workspace" aria-label="Workspace"
+                    class="sidebar-tab w-full flex flex-col items-center py-2 text-primary bg-surface-container-highest border-l-2 border-primary transition-all duration-150 group">
+                    <span class="material-symbols-outlined mb-1" style="font-size: 20px;">terminal</span>
+                    <span
+                        class="font-label-sm text-label-sm hidden group-hover:block absolute left-14 bg-surface-container-high px-2 py-1 rounded border border-outline-variant z-20 whitespace-nowrap">Workspace</span>
+                </button>
+                <!-- History Tab -->
+                <button id="btn-tab-history" aria-label="History"
+                    class="sidebar-tab w-full flex flex-col items-center py-2 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface border-l-2 border-transparent transition-all duration-150 group">
+                    <span class="material-symbols-outlined mb-1" style="font-size: 20px;">history</span>
+                    <span
+                        class="font-label-sm text-label-sm hidden group-hover:block absolute left-14 bg-surface-container-high px-2 py-1 rounded border border-outline-variant z-20 whitespace-nowrap">History</span>
+                </button>
+                <!-- Prompts Tab -->
+                <button id="btn-tab-prompts" aria-label="Prompts"
+                    class="sidebar-tab w-full flex flex-col items-center py-2 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface border-l-2 border-transparent transition-all duration-150 group">
+                    <span class="material-symbols-outlined mb-1" style="font-size: 20px;">description</span>
+                    <span
+                        class="font-label-sm text-label-sm hidden group-hover:block absolute left-14 bg-surface-container-high px-2 py-1 rounded border border-outline-variant z-20 whitespace-nowrap">Prompts</span>
+                </button>
+                <!-- Docs Tab -->
+                <button id="btn-tab-docs" aria-label="Docs"
+                    class="sidebar-tab w-full flex flex-col items-center py-2 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface border-l-2 border-transparent transition-all duration-150 group">
+                    <span class="material-symbols-outlined mb-1" style="font-size: 20px;">help</span>
+                    <span
+                        class="font-label-sm text-label-sm hidden group-hover:block absolute left-14 bg-surface-container-high px-2 py-1 rounded border border-outline-variant z-20 whitespace-nowrap">Docs</span>
+                </button>
+            </div>
+            <div class="flex flex-col gap-2 w-full mt-auto mb-12">
+                <!-- Footer Tabs -->
+                <button id="btn-tab-terminal" aria-label="Terminal"
+                    class="sidebar-tab w-full flex flex-col items-center py-2 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface border-l-2 border-transparent transition-all duration-150 group">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">data_object</span>
+                    <span
+                        class="font-label-sm text-label-sm hidden group-hover:block absolute left-14 bg-surface-container-high px-2 py-1 rounded border border-outline-variant z-20 whitespace-nowrap">Terminal</span>
+                </button>
+                <button id="btn-tab-logs" aria-label="Logs"
+                    class="sidebar-tab w-full flex flex-col items-center py-2 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface border-l-2 border-transparent transition-all duration-150 group">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">list_alt</span>
+                    <span
+                        class="font-label-sm text-label-sm hidden group-hover:block absolute left-14 bg-surface-container-high px-2 py-1 rounded border border-outline-variant z-20 whitespace-nowrap">Logs</span>
+                </button>
+            </div>
+        </aside>
+        <!-- Two Column Layout -->
+        <main class="flex-1 flex w-full h-full overflow-hidden">
+            <!-- Left Column (Multi-tab Panel Container) -->
+            <section class="flex-1 border-r border-outline-variant flex flex-col min-w-0 bg-background">
+                
+                <!-- Panel 1: Workspace -->
+                <div id="panel-workspace" class="flex flex-col h-full w-full">
+                    <!-- Panel Header -->
+                    <header class="bg-surface-container-low border-b border-outline-variant px-panel-padding py-2 flex justify-between items-center h-10 flex-shrink-0">
+                        <h2 class="font-label-sm text-label-sm text-on-surface flex items-center gap-2 uppercase tracking-wider">
+                            <span class="material-symbols-outlined text-outline" style="font-size: 16px;">edit_document</span>
+                            Project Context
+                        </h2>
+                        <div class="flex gap-2">
+                            <button id="btn-clear" class="text-outline hover:text-on-surface transition-colors" title="Clear">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">clear_all</span>
+                            </button>
+                        </div>
+                    </header>
+                    <!-- Editor Area -->
+                    <div class="flex-1 flex flex-col p-panel-padding gap-3 overflow-y-auto">
+                        <div class="font-label-sm text-label-sm text-outline-variant uppercase tracking-widest mb-1 border-b border-outline-variant pb-1 inline-block w-max">
+                            Requirements Input
+                        </div>
+                        <div class="flex-1 border border-outline-variant rounded bg-surface relative flex overflow-hidden group focus-within:border-primary transition-colors">
+                            <!-- Line Numbers Gutter -->
+                            <div class="bg-surface-container-low w-10 border-r border-outline-variant text-right py-2 px-1 font-code-md text-code-md text-outline select-none flex-shrink-0">
+                                1<br />2<br />3<br />4<br />5<br />6<br />7<br />8<br />9<br />10<br />11
+                            </div>
+                            <!-- Text Area -->
+                            <textarea id="requirements-input"
+                                class="flex-1 bg-transparent border-none resize-none font-code-md text-code-md text-on-surface p-2 focus:ring-0 w-full h-full"
+                                placeholder="Paste user stories, AC, or endpoint specifications here..." spellcheck="false">User Authentication API Endpoint: POST /api/v1/auth/login
+
+Requirements:
+1. Accept JSON payload with 'email' and 'password'.
+2. Return 200 OK with JWT token on success.
+3. Return 401 Unauthorized for invalid credentials.
+4. Return 400 Bad Request if email format is invalid.
+5. Return 429 Too Many Requests after 5 failed attempts per minute from same IP.
+6. Password must be hashed using bcrypt before comparison.
+7. Logs successful logins, but NOT passwords.
+                            </textarea>
+                        </div>
+                        <!-- Drag & Drop Zone -->
+                        <div class="border-2 border-dashed border-outline-variant rounded p-6 flex flex-col items-center justify-center bg-surface-container-lowest hover:bg-surface-container transition-colors cursor-pointer group mt-2">
+                            <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors mb-2" style="font-size: 32px;">upload_file</span>
+                            <p class="font-label-sm text-label-sm text-on-surface">Upload API Docs / PDFs</p>
+                            <p class="font-code-md text-[10px] text-outline mt-1 text-center">Drag files here or click to browse. Max 10MB.</p>
+                        </div>
+                        <!-- Generate Action -->
+                        <div class="mt-2 flex justify-end">
+                            <button id="btn-generate"
+                                class="bg-primary-container hover:bg-primary-fixed text-white font-label-sm text-label-sm px-6 py-2 rounded flex items-center gap-2 transition-all shadow-[0_0_10px_rgba(88,166,255,0.2)] hover:shadow-[0_0_15px_rgba(88,166,255,0.4)]">
+                                <span id="btn-generate-icon" class="material-symbols-outlined" style="font-size: 16px;">bolt</span>
+                                <span id="btn-generate-label">GENERATE TEST CASES</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 2: History -->
+                <div id="panel-history" class="hidden flex flex-col h-full w-full">
+                    <header class="bg-surface-container-low border-b border-outline-variant px-panel-padding py-2 flex justify-between items-center h-10 flex-shrink-0">
+                        <h2 class="font-label-sm text-label-sm text-on-surface flex items-center gap-2 uppercase tracking-wider">
+                            <span class="material-symbols-outlined text-outline" style="font-size: 16px;">history</span>
+                            Generation History
+                        </h2>
+                    </header>
+                    <div class="flex-1 p-panel-padding overflow-y-auto space-y-3">
+                        <div class="font-label-sm text-outline-variant uppercase tracking-widest border-b border-outline-variant pb-1 mb-2">Past Generations</div>
+                        <div id="history-list" class="space-y-2">
+                            <!-- Populated dynamically / fallback mock -->
+                            <div class="bg-surface-container border border-outline-variant rounded p-3 hover:border-primary transition-all cursor-pointer">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="font-label-sm font-semibold text-primary">POST /api/v1/auth/login</span>
+                                    <span class="font-code-md text-[10px] text-outline">Just now</span>
+                                </div>
+                                <p class="text-xs text-on-surface-variant line-clamp-1 mb-2">User stories, AC, or endpoint specifications for Login...</p>
+                                <div class="flex justify-between items-center font-code-md text-[10px] text-outline">
+                                    <span>Model: gemini-2.5-flash</span>
+                                    <span>8 Test cases (2.4s)</span>
+                                </div>
+                            </div>
+                            <div class="bg-surface-container border border-outline-variant rounded p-3 hover:border-primary transition-all cursor-pointer opacity-85">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="font-label-sm font-semibold text-on-surface">GET /api/v1/users/profile</span>
+                                    <span class="font-code-md text-[10px] text-outline">2 hours ago</span>
+                                </div>
+                                <p class="text-xs text-on-surface-variant line-clamp-1 mb-2">Accepts Bearer Token. Returns email, username, and role...</p>
+                                <div class="flex justify-between items-center font-code-md text-[10px] text-outline">
+                                    <span>Model: Llama 3 8B</span>
+                                    <span>5 Test cases (1.8s)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 3: Prompts -->
+                <div id="panel-prompts" class="hidden flex flex-col h-full w-full">
+                    <header class="bg-surface-container-low border-b border-outline-variant px-panel-padding py-2 flex justify-between items-center h-10 flex-shrink-0">
+                        <h2 class="font-label-sm text-label-sm text-on-surface flex items-center gap-2 uppercase tracking-wider">
+                            <span class="material-symbols-outlined text-outline" style="font-size: 16px;">description</span>
+                            System Prompts Library
+                        </h2>
+                    </header>
+                    <div class="flex-1 p-panel-padding overflow-y-auto space-y-3">
+                        <div class="font-label-sm text-outline-variant uppercase tracking-widest border-b border-outline-variant pb-1 mb-2">Select a Framework Style</div>
+                        <div class="bg-surface-container border border-primary rounded p-3 cursor-pointer">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-label-sm font-semibold text-primary">Pytest with Mock (Default)</span>
+                                <span class="bg-primary-container text-white font-code-md text-[9px] px-1.5 py-0.5 rounded">Active</span>
+                            </div>
+                            <p class="text-xs text-on-surface-variant">Generates raw, runnable Python pytest test code utilizing standard library mocks, fixtures, and parameterized checks.</p>
+                        </div>
+                        <div class="bg-surface-container border border-outline-variant rounded p-3 hover:border-primary transition-all cursor-pointer">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-label-sm font-semibold text-on-surface">Unittest Style</span>
+                                <span class="bg-surface-container-highest text-outline font-code-md text-[9px] px-1.5 py-0.5 rounded">Standard</span>
+                            </div>
+                            <p class="text-xs text-on-surface-variant">Generates native Python unittest.TestCase classes using self.assertEqual, patch decorator syntax, and setup methods.</p>
+                        </div>
+                        <div class="bg-surface-container border border-outline-variant rounded p-3 hover:border-primary transition-all cursor-pointer">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-label-sm font-semibold text-on-surface">Pytest BDD (Gherkin style)</span>
+                                <span class="bg-surface-container-highest text-outline font-code-md text-[9px] px-1.5 py-0.5 rounded">Behavioral</span>
+                            </div>
+                            <p class="text-xs text-on-surface-variant">Formats outputs using Given, When, Then test boundaries utilizing pytest-bdd steps and feature structures.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 4: Docs -->
+                <div id="panel-docs" class="hidden flex flex-col h-full w-full">
+                    <header class="bg-surface-container-low border-b border-outline-variant px-panel-padding py-2 flex justify-between items-center h-10 flex-shrink-0">
+                        <h2 class="font-label-sm text-label-sm text-on-surface flex items-center gap-2 uppercase tracking-wider">
+                            <span class="material-symbols-outlined text-outline" style="font-size: 16px;">help</span>
+                            Help & Documentation
+                        </h2>
+                    </header>
+                    <div class="flex-1 p-panel-padding overflow-y-auto space-y-4">
+                        <div>
+                            <h3 class="font-label-sm font-semibold text-primary uppercase tracking-wide mb-1">API Specification Formatting</h3>
+                            <p class="text-xs text-on-surface-variant leading-relaxed">For optimal results, specify the endpoint route, accepted JSON body format, expected response status codes, validation limits, and logging rules as bullet points.</p>
+                        </div>
+                        <div>
+                            <h3 class="font-label-sm font-semibold text-primary uppercase tracking-wide mb-1">Configuring API Keys</h3>
+                            <p class="text-xs text-on-surface-variant leading-relaxed">Make sure to add your API credentials into the project root's <code class="bg-surface-container border border-outline-variant px-1 rounded text-white font-code-md text-xs">.env</code> file:</p>
+                            <pre class="bg-surface-container border border-outline-variant rounded p-2 text-xs font-code-md text-on-surface-variant mt-1">GEMINI_API_KEY=AIzaSy...
+OPENROUTER_API_KEY=sk-or-v1-...</pre>
+                        </div>
+                        <div>
+                            <h3 class="font-label-sm font-semibold text-primary uppercase tracking-wide mb-1">Fast Model Selection</h3>
+                            <p class="text-xs text-on-surface-variant leading-relaxed">Toggle the OpenRouter tab to select from over 25+ models grouped by pricing, performance, coding depth, and execution speeds.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 5: Terminal -->
+                <div id="panel-terminal" class="hidden flex flex-col h-full w-full">
+                    <header class="bg-surface-container-low border-b border-outline-variant px-panel-padding py-2 flex justify-between items-center h-10 flex-shrink-0">
+                        <h2 class="font-label-sm text-label-sm text-on-surface flex items-center gap-2 uppercase tracking-wider">
+                            <span class="material-symbols-outlined text-outline" style="font-size: 16px;">data_object</span>
+                            Terminal Console
+                        </h2>
+                    </header>
+                    <div class="flex-1 p-panel-padding bg-[#0b0e14] overflow-y-auto font-code-md text-xs text-[#a8ff60] space-y-1">
+                        <div>$ uvicorn main:app --reload</div>
+                        <div class="text-white">INFO:     Will watch for changes in these directories: ['P:\TestGen-AI']</div>
+                        <div class="text-white">INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)</div>
+                        <div class="text-white">INFO:     Started reloader process [24192] using WatchFiles</div>
+                        <div class="text-white">INFO:     Started server process [21116]</div>
+                        <div class="text-white">INFO:     Waiting for application startup.</div>
+                        <div class="text-white">INFO:     Application startup complete.</div>
+                        <div class="text-blue-400">INFO:     127.0.0.1:51023 - "GET / HTTP/1.1" 200 OK</div>
+                        <div class="text-blue-400">INFO:     127.0.0.1:51023 - "GET /api/v1/models HTTP/1.1" 200 OK</div>
+                        <div class="text-[#f1c40f]" id="terminal-gen-log"></div>
+                    </div>
+                </div>
+
+                <!-- Panel 6: Logs -->
+                <div id="panel-logs" class="hidden flex flex-col h-full w-full">
+                    <header class="bg-surface-container-low border-b border-outline-variant px-panel-padding py-2 flex justify-between items-center h-10 flex-shrink-0">
+                        <h2 class="font-label-sm text-label-sm text-on-surface flex items-center gap-2 uppercase tracking-wider">
+                            <span class="material-symbols-outlined text-outline" style="font-size: 16px;">list_alt</span>
+                            System Execution Logs
+                        </h2>
+                    </header>
+                    <div id="system-logs-container" class="flex-1 p-panel-padding bg-[#0b0e14] overflow-y-auto font-code-md text-xs text-outline space-y-1">
+                        <div>[2026-05-25 20:06:12] [SYS] System initialized. Environment: development</div>
+                        <div>[2026-05-25 20:06:12] [SYS] Loading .env configuration files...</div>
+                        <div>[2026-05-25 20:06:13] [API] Loaded GEMINI_API_KEY (AIzaSy***)</div>
+                        <div>[2026-05-25 20:06:13] [API] Loaded OPENROUTER_API_KEY (sk-or-v1-***)</div>
+                        <div>[2026-05-25 20:06:14] [SYS] Serving index.html on FastAPI app</div>
+                        <div id="runtime-logs-log"></div>
+                    </div>
+                </div>
+            </section>
+            <!-- Right Column (Output) -->
+            <section class="flex-1 flex flex-col min-w-0 bg-background">
+                <!-- Panel Header -->
+                <header
+                    class="bg-surface-container-low border-b border-outline-variant px-panel-padding py-2 flex justify-between items-center h-10 flex-shrink-0">
+                    <h2
+                        class="font-label-sm text-label-sm text-on-surface flex items-center gap-2 uppercase tracking-wider">
+                        <span class="material-symbols-outlined text-outline" style="font-size: 16px;">code_blocks</span>
+                        Generated Output
+                    </h2>
+                    <!-- Tabs -->
+                    <div class="flex border border-outline-variant rounded overflow-hidden">
+                        <button data-testtype="unit"
+                            class="test-type-tab font-label-sm text-label-sm px-3 py-1 bg-surface-container-highest text-primary border-r border-outline-variant last:border-r-0">Unit
+                            Tests</button>
+                        <button data-testtype="integration"
+                            class="test-type-tab font-label-sm text-label-sm px-3 py-1 bg-surface text-on-surface-variant hover:bg-surface-container border-r border-outline-variant last:border-r-0 transition-colors">Integration</button>
+                        <button data-testtype="edge"
+                            class="test-type-tab font-label-sm text-label-sm px-3 py-1 bg-surface text-on-surface-variant hover:bg-surface-container border-r border-outline-variant last:border-r-0 transition-colors">Edge
+                            Cases</button>
+                    </div>
+                </header>
+                <!-- Output Area -->
+                <div class="flex-1 flex flex-col p-panel-padding overflow-hidden">
+                    <!-- Action Bar -->
+                    <div class="flex justify-between items-center mb-2">
+                        <div id="status-bar" class="font-label-sm text-label-sm text-secondary flex items-center gap-1">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">check_circle</span>
+                            <span id="status-text">Generated 8 Test Cases in 2.4s</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button id="btn-copy"
+                                class="font-label-sm text-label-sm border border-outline-variant text-on-surface-variant px-3 py-1 rounded hover:bg-surface-variant hover:text-on-surface transition-colors flex items-center gap-1">
+                                <span class="material-symbols-outlined" style="font-size: 14px;">content_copy</span>
+                                Copy Code
+                            </button>
+                            <button id="btn-export"
+                                class="font-label-sm text-label-sm border border-outline-variant text-on-surface-variant px-3 py-1 rounded hover:bg-surface-variant hover:text-on-surface transition-colors flex items-center gap-1">
+                                <span class="material-symbols-outlined" style="font-size: 14px;">download</span>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Code Block Viewer -->
+                    <div
+                        class="flex-1 border border-outline-variant rounded bg-[#0D1117] flex flex-col overflow-hidden">
+                        <!-- Code Header -->
+                        <div
+                            class="bg-surface-container-low border-b border-outline-variant px-3 py-1 flex justify-between items-center">
+                            <span class="font-label-sm text-label-sm text-outline">test_auth_api.py</span>
+                            <span
+                                class="font-label-sm text-[10px] text-outline px-1.5 py-0.5 border border-outline-variant rounded bg-surface">Python
+                                / Pytest</span>
+                        </div>
+                        <!-- Code Content with Gutter -->
+                        <div class="flex-1 flex overflow-auto relative">
+                            <!-- Gutter -->
+                            <div id="output-gutter"
+                                class="bg-[#0b0e14] border-r border-outline-variant w-12 flex-shrink-0 text-right py-2 px-2 font-code-md text-code-md text-[#4b5563] select-none sticky left-0 z-10">
+                                1<br />2<br />3<br />4<br />5<br />6<br />7<br />8<br />9<br />10<br />11<br />12<br />13<br />14<br />15<br />16<br />17<br />18<br />19<br />20<br />21<br />22<br />23<br />24<br />25<br />26
+                            </div>
+                            <!-- Syntax Highlighted Content -->
+                            <pre id="code-output"
+                                class="flex-1 font-code-md text-code-md p-2 m-0 overflow-visible text-[#c9d1d9] whitespace-pre"><code class="language-python"><span class="text-[#ff7b72]">import</span> pytest
+<span class="text-[#ff7b72]">from</span> unittest.mock <span class="text-[#ff7b72]">import</span> patch
+<span class="text-[#ff7b72]">from</span> app <span class="text-[#ff7b72]">import</span> create_app
+
+<span class="text-[#79c0ff]">@pytest.fixture</span>
+<span class="text-[#ff7b72]">def</span> <span class="text-[#d2a8ff]">client</span>():
+    app = create_app(<span class="text-[#a5d6ff]">'testing'</span>)
+    <span class="text-[#ff7b72]">with</span> app.test_client() <span class="text-[#ff7b72]">as</span> client:
+        <span class="text-[#ff7b72]">yield</span> client
+
+<span class="text-[#8b949e]"># TC-01: Valid Login</span>
+<span class="text-[#ff7b72]">def</span> <span class="text-[#d2a8ff]">test_login_success</span>(client):
+    payload = {
+        <span class="text-[#a5d6ff]">"email"</span>: <span class="text-[#a5d6ff]">"valid.user@example.com"</span>,
+        <span class="text-[#a5d6ff]">"password"</span>: <span class="text-[#a5d6ff]">"SecureP@ss123"</span>
+    }
+    response = client.post(<span class="text-[#a5d6ff]">'/api/v1/auth/login'</span>, json=payload)
+    
+    <span class="text-[#ff7b72]">assert</span> response.status_code == <span class="text-[#79c0ff]">200</span>
+    <span class="text-[#ff7b72]">assert</span> <span class="text-[#a5d6ff]">'token'</span> <span class="text-[#ff7b72]">in</span> response.json
+
+<span class="text-[#8b949e]"># TC-02: Invalid Credentials</span>
+<span class="text-[#ff7b72]">def</span> <span class="text-[#d2a8ff]">test_login_unauthorized</span>(client):
+    payload = {
+        <span class="text-[#a5d6ff]">"email"</span>: <span class="text-[#a5d6ff]">"valid.user@example.com"</span>,
+        <span class="text-[#a5d6ff]">"password"</span>: <span class="text-[#a5d6ff]">"WrongPass!"</span>
+    }
+    response = client.post(<span class="text-[#a5d6ff]">'/api/v1/auth/login'</span>, json=payload)
+    
+    <span class="text-[#ff7b72]">assert</span> response.status_code == <span class="text-[#79c0ff]">401</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script>
+        // ─── State ────────────────────────────────────────────────────────────────────
+        let activeModel = 'gemini';    // 'gemini' | 'openrouter'
+        let activeTestType = 'unit';   // 'unit' | 'integration' | 'edge'
+
+        // ─── Models Config (25+ OpenRouter models grouped by category) ──────────────────
+        const openRouterModels = [
+            {
+                group: "🔥 Free & Fast Models (No Cost)",
+                models: [
+                    { id: "meta-llama/llama-3-8b-instruct:free", name: "Llama 3 8B Instruct (Free)" },
+                    { id: "google/gemma-2-9b-it:free", name: "Gemma 2 9B IT (Free)" },
+                    { id: "mistralai/mistral-7b-instruct:free", name: "Mistral 7B Instruct (Free)" },
+                    { id: "qwen/qwen-2-7b-instruct:free", name: "Qwen 2 7B Instruct (Free)" },
+                    { id: "microsoft/phi-3-mini-128k-instruct:free", name: "Phi-3 Mini 128k (Free)" },
+                    { id: "openchat/openchat-7b:free", name: "OpenChat 7B (Free)" },
+                    { id: "nvidia/nemotron-4-340b-instruct:free", name: "Nemotron 4 340B (Free)" },
+                    { id: "meta-llama/llama-3-70b-instruct:free", name: "Llama 3 70B Instruct (Free)" },
+                ]
+            },
+            {
+                group: "💻 Code Specialists (Optimized)",
+                models: [
+                    { id: "qwen/qwen-2.5-coder-32b-instruct", name: "Qwen 2.5 Coder 32B" },
+                    { id: "mistralai/codestral-7b", name: "Codestral 7B (Mistral)" },
+                    { id: "meta-llama/codellama-34b-instruct", name: "CodeLlama 34B Instruct" },
+                    { id: "deepseek/deepseek-coder", name: "DeepSeek Coder" },
+                ]
+            },
+            {
+                group: "⚡ Blazing Fast Flagships (Efficient)",
+                models: [
+                    { id: "openai/gpt-4o-mini", name: "GPT-4o Mini (OpenAI)" },
+                    { id: "google/gemini-flash-1.5", name: "Gemini 1.5 Flash (Google)" },
+                    { id: "anthropic/claude-3-haiku", name: "Claude 3 Haiku (Anthropic)" },
+                    { id: "deepseek/deepseek-chat", name: "DeepSeek Chat V3" },
+                    { id: "meta-llama/llama-3.1-8b-instruct", name: "Llama 3.1 8B Instruct" },
+                ]
+            },
+            {
+                group: "🧠 Premium Reasoning (State-of-the-Art)",
+                models: [
+                    { id: "anthropic/claude-3.5-sonnet", name: "Claude 3.5 Sonnet (Recommended)" },
+                    { id: "openai/gpt-4o", name: "GPT-4o (OpenAI)" },
+                    { id: "google/gemini-pro-1.5", name: "Gemini 1.5 Pro (Google)" },
+                    { id: "meta-llama/llama-3.1-70b-instruct", name: "Llama 3.1 70B Instruct" },
+                    { id: "meta-llama/llama-3.1-405b-instruct", name: "Llama 3.1 405B Instruct" },
+                    { id: "mistralai/mistral-large", name: "Mistral Large" },
+                    { id: "cohere/command-r-plus", name: "Command R+" },
+                    { id: "qwen/qwen-2.5-72b-instruct", name: "Qwen 2.5 72B Instruct" },
+                ]
+            }
+        ];
+
+        // ─── SideNavBar Tab Navigation ────────────────────────────────────────────────
+        const tabs = {
+            workspace: { btn: document.getElementById('btn-tab-workspace'), panel: document.getElementById('panel-workspace') },
+            history: { btn: document.getElementById('btn-tab-history'), panel: document.getElementById('panel-history') },
+            prompts: { btn: document.getElementById('btn-tab-prompts'), panel: document.getElementById('panel-prompts') },
+            docs: { btn: document.getElementById('btn-tab-docs'), panel: document.getElementById('panel-docs') },
+            terminal: { btn: document.getElementById('btn-tab-terminal'), panel: document.getElementById('panel-terminal') },
+            logs: { btn: document.getElementById('btn-tab-logs'), panel: document.getElementById('panel-logs') }
+        };
+
+        function switchTab(activeKey) {
+            Object.keys(tabs).forEach(key => {
+                const tab = tabs[key];
+                if (key === activeKey) {
+                    tab.panel.classList.remove('hidden');
+                    tab.btn.className = 'sidebar-tab w-full flex flex-col items-center py-2 text-primary bg-surface-container-highest border-l-2 border-primary transition-all duration-150 group';
+                } else {
+                    tab.panel.classList.add('hidden');
+                    tab.btn.className = 'sidebar-tab w-full flex flex-col items-center py-2 text-on-surface-variant hover:bg-surface-variant hover:text-on-surface border-l-2 border-transparent transition-all duration-150 group';
+                }
+            });
+        }
+
+        Object.keys(tabs).forEach(key => {
+            tabs[key].btn.addEventListener('click', () => switchTab(key));
+        });
+
+        // ─── Real-time Logging Helper ─────────────────────────────────────────────────
+        const terminalGenLog = document.getElementById('terminal-gen-log');
+        const runtimeLogsLog = document.getElementById('runtime-logs-log');
+
+        function addLogEntry(sysMsg, termMsg) {
+            const timeStr = new Date().toISOString().replace('T', ' ').substring(0, 19);
+            if (runtimeLogsLog) {
+                const logDiv = document.createElement('div');
+                logDiv.textContent = `[${timeStr}] ${sysMsg}`;
+                runtimeLogsLog.appendChild(logDiv);
+            }
+            if (terminalGenLog && termMsg) {
+                const logDiv = document.createElement('div');
+                logDiv.textContent = termMsg;
+                terminalGenLog.appendChild(logDiv);
+            }
+        }
+
+        // ─── Initialize Model Selector ────────────────────────────────────────────────
+        const modelSelect = document.getElementById('openrouter-model-select');
+        const openrouterModelContainer = document.getElementById('openrouter-model-container');
+
+        openRouterModels.forEach(group => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = group.group;
+            group.models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.textContent = model.name;
+                optgroup.appendChild(option);
+            });
+            modelSelect.appendChild(optgroup);
+        });
+
+        // ─── Model selector buttons ───────────────────────────────────────────────────
+        const btnGemini = document.getElementById('btn-gemini');
+        const btnOpenRouter = document.getElementById('btn-openrouter');
+
+        function setModel(model) {
+            activeModel = model;
+            const isGemini = model === 'gemini';
+            btnGemini.className = isGemini
+                ? 'font-label-sm text-label-sm bg-primary-container text-white px-3 py-1 rounded hover:bg-opacity-90 transition-colors flex items-center gap-2'
+                : 'font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface border border-outline-variant px-3 py-1 rounded hover:bg-surface-variant transition-colors flex items-center gap-2';
+            btnOpenRouter.className = isGemini
+                ? 'font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface border border-outline-variant px-3 py-1 rounded hover:bg-surface-variant transition-colors flex items-center gap-2'
+                : 'font-label-sm text-label-sm bg-primary-container text-white px-3 py-1 rounded hover:bg-opacity-90 transition-colors flex items-center gap-2';
+            
+            if (isGemini) {
+                openrouterModelContainer.classList.add('hidden');
+            } else {
+                openrouterModelContainer.classList.remove('hidden');
+            }
+        }
+
+        btnGemini.addEventListener('click', () => setModel('gemini'));
+        btnOpenRouter.addEventListener('click', () => setModel('openrouter'));
+
+        // ─── Test-type tabs ────────────────────────────────────────────────────────────
+        const testTypeTabs = document.querySelectorAll('.test-type-tab');
+
+        testTypeTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                activeTestType = tab.dataset.testtype;
+                testTypeTabs.forEach(t => {
+                    const isActive = t === tab;
+                    t.className = isActive
+                        ? 'test-type-tab font-label-sm text-label-sm px-3 py-1 bg-surface-container-highest text-primary border-r border-outline-variant last:border-r-0'
+                        : 'test-type-tab font-label-sm text-label-sm px-3 py-1 bg-surface text-on-surface-variant hover:bg-surface-container border-r border-outline-variant last:border-r-0 transition-colors';
+                });
+            });
+        });
+
+        // ─── Generate ─────────────────────────────────────────────────────────────────
+        const btnGenerate = document.getElementById('btn-generate');
+        const btnGenerateIcon = document.getElementById('btn-generate-icon');
+        const btnGenerateLabel = document.getElementById('btn-generate-label');
+        const requirementsInput = document.getElementById('requirements-input');
+        const codeOutput = document.getElementById('code-output');
+        const statusText = document.getElementById('status-text');
+        const statusBar = document.getElementById('status-bar');
+
+        function setLoading(loading) {
+            btnGenerate.disabled = loading;
+            if (loading) {
+                btnGenerateIcon.textContent = 'hourglass_empty';
+                btnGenerateLabel.textContent = 'GENERATING...';
+                btnGenerate.classList.add('opacity-70', 'cursor-not-allowed');
+                statusBar.querySelector('.material-symbols-outlined').textContent = 'sync';
+                statusText.textContent = 'Generating test cases…';
+            } else {
+                btnGenerateIcon.textContent = 'bolt';
+                btnGenerateLabel.textContent = 'GENERATE TEST CASES';
+                btnGenerate.classList.remove('opacity-70', 'cursor-not-allowed');
+            }
+        }
+
+        function updateLineNumbers(code) {
+            const lineCount = (code.match(/\n/g) || []).length + 1;
+            const gutter = document.getElementById('output-gutter');
+            if (gutter) {
+                gutter.innerHTML = Array.from({ length: lineCount }, (_, i) => i + 1).join('<br/>');
+            }
+        }
+
+        btnGenerate.addEventListener('click', async () => {
+            const context = requirementsInput.value.trim();
+            if (!context) {
+                alert('Please enter your requirements first.');
+                return;
+            }
+
+            setLoading(true);
+            
+            // Revert state indicators to normal on new attempt
+            statusBar.querySelector('.material-symbols-outlined').textContent = 'sync';
+            statusBar.classList.remove('text-error');
+            statusBar.classList.add('text-secondary');
+
+            const chosenModel = activeModel === 'openrouter' ? modelSelect.value : 'gemini-2.5-flash';
+            addLogEntry(`[API] Initiating generate request using choice: ${activeModel} (${chosenModel})`, `INFO:     API Request POST /api/generate with model: ${chosenModel}`);
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        project_context: context,
+                        model_choice: activeModel,
+                        model_name: activeModel === 'openrouter' ? modelSelect.value : '',
+                        test_type: activeTestType,
+                    }),
+                });
+
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({ detail: 'Unknown error' }));
+                    throw new Error(err.detail || `HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                const code = data.code || '';
+
+                // Inject raw (escaped) code into the pre>code block
+                codeOutput.querySelector('code').textContent = code;
+
+                // Update status bar
+                statusBar.querySelector('.material-symbols-outlined').textContent = 'check_circle';
+                statusText.textContent = `Generated ${data.test_count} Test Case${data.test_count !== 1 ? 's' : ''} in ${data.elapsed}s`;
+
+                // Update line numbers
+                updateLineNumbers(code);
+
+                addLogEntry(`[API] Successfully generated ${data.test_count} tests in ${data.elapsed}s.`, `INFO:     Response 200 OK. Generated ${data.test_count} tests.`);
+
+                // Prepend to History dynamically
+                const historyList = document.getElementById('history-list');
+                if (historyList) {
+                    const item = document.createElement('div');
+                    item.className = 'bg-surface-container border border-outline-variant rounded p-3 hover:border-primary transition-all cursor-pointer';
+                    item.innerHTML = `
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-label-sm font-semibold text-primary">POST /api/v1/auth/login</span>
+                            <span class="font-code-md text-[10px] text-outline">Just now</span>
+                        </div>
+                        <p class="text-xs text-on-surface-variant line-clamp-1 mb-2">${context.substring(0, 60)}...</p>
+                        <div class="flex justify-between items-center font-code-md text-[10px] text-outline">
+                            <span>Model: ${chosenModel}</span>
+                            <span>${data.test_count} Test cases (${data.elapsed}s)</span>
+                        </div>
+                    `;
+                    item.addEventListener('click', () => {
+                        requirementsInput.value = context;
+                        codeOutput.querySelector('code').textContent = code;
+                        updateLineNumbers(code);
+                        switchTab('workspace');
+                    });
+                    historyList.insertBefore(item, historyList.firstChild);
+                }
+
+            } catch (err) {
+                statusBar.querySelector('.material-symbols-outlined').textContent = 'error';
+                statusBar.classList.remove('text-secondary');
+                statusBar.classList.add('text-error');
+                statusText.textContent = `Error: ${err.message}`;
+                console.error('Generation error:', err);
+                addLogEntry(`[ERR] Generation failed: ${err.message}`, `ERROR:    Generation request failed: ${err.message}`);
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // ─── Copy Code ────────────────────────────────────────────────────────────────
+        document.getElementById('btn-copy').addEventListener('click', async () => {
+            const code = codeOutput.querySelector('code').textContent;
+            if (!code) return;
+            try {
+                await navigator.clipboard.writeText(code);
+                const btn = document.getElementById('btn-copy');
+                btn.querySelector('.material-symbols-outlined').textContent = 'check';
+                setTimeout(() => { btn.querySelector('.material-symbols-outlined').textContent = 'content_copy'; }, 1500);
+            } catch {
+                // fallback
+                const ta = document.createElement('textarea');
+                ta.value = code;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            }
+        });
+
+        // ─── Export Code ──────────────────────────────────────────────────────────────
+        document.getElementById('btn-export').addEventListener('click', () => {
+            const code = codeOutput.querySelector('code').textContent;
+            if (!code) return;
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'test_auth_api.py';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // ─── Clear Input ───────────────────────────────────────────────────────────────
+        document.getElementById('btn-clear').addEventListener('click', () => {
+            requirementsInput.value = '';
+        });
+    </script>
+</body>
+
+</html>
