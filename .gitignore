@@ -1,1 +1,8 @@
-*.env
+.env
+.env.*
+.env.local
+__pycache__/
+*.py[cod]
+.gemini/
+.idea/
+.vscode/
