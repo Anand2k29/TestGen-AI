@@ -2,7 +2,7 @@
 
 TestGen AI is a premium, high-density developer dashboard engineered to automatically transform natural language API specifications, user stories, and acceptance criteria into clean, runnable Python Pytest source code.
 
-![TestGen AI Dashboard Screenshot](assets/assets/dashboard.png)
+![TestGen AI Dashboard Screenshot](assets/dashboard.png)
 
 ---
 
