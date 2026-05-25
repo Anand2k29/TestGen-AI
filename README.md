@@ -1,71 +1,123 @@
-# TestGen AI ⚡
+# TestGen AI
 
-TestGen AI is a premium, high-density developer dashboard engineered to automatically transform natural language API specifications, user stories, and acceptance criteria into clean, runnable Python Pytest source code.
+TestGen AI is a FastAPI-powered developer dashboard that turns API requirements, user stories, and acceptance criteria into clean Python Pytest test code.
 
 ![TestGen AI Dashboard Screenshot](assets/dashboard.png)
 
----
+## Team Binary
 
-## 👥 Team: **Binary**
-* **Jyotasana**
-* **Anand Minejes**
+- Jyotasana
+- Anand Minejes
 
----
+## Features
 
-## ✨ Features
-1. **Multi-Model Intelligence**: Toggles seamlessly between direct **Google Gemini (using Gemini 2.5 Flash)** and **OpenRouter** (offering over 25+ free, speed-optimized, code-specialist, and reasoning-heavy LLMs).
-2. **Interactive SideNavBar Multi-View Panel**:
-   * **Workspace**: Project context input and requirement editor.
-   * **History**: Interactive run history listing past generated specifications with clicking capabilities to reload.
-   * **Prompts**: Toggle custom frameworks styles (Pytest with Mock, standard Unittest, or Pytest BDD).
-   * **Docs**: Interactive helper reference formatting instructions and environment setup guidelines.
-   * **Terminal**: Direct simulation console showing local ASGI endpoint hits and status logs.
-   * **Logs**: Detailed execution log tracker.
-3. **Advanced File Upload**: Supports clicking the drag-and-drop zone to launch a native OS file dialog or dragging files directly to load requirements in real-time.
-4. **Key Obfuscation & Security**: Exception stack traces automatically sanitize and mask API keys (`AIzaSy***` and `Bearer sk-or-v1-***`) to prevent credentials exposure.
-5. **Git Safety**: Upgraded exclusions ensuring `.env` files are never tracked or committed.
-6. **Code Actions**: Clipboard copy helper and instant `.py` export actions.
+- Generate Pytest test cases from natural language project context.
+- Switch between direct Google Gemini and OpenRouter models.
+- Use current OpenRouter free model IDs, with a backend fallback when a stale model slug is submitted.
+- Upload `.txt`, `.json`, `.md`, `.yaml`, or `.yml` files into the requirements editor.
+- Copy generated code to the clipboard or export it as a `.py` file.
+- Mask API keys in provider error messages before returning them to the UI.
 
----
+## Tech Stack
 
-## 🛠️ Tech Stack
-* **Backend**: FastAPI (Python ASGI)
-* **Frontend**: HTML5, Vanilla JavaScript, Vanilla CSS, Tailwind CSS utilities, Material Icons
-* **Hosting Configuration**: Native Vercel Python Builder compatibility (`vercel.json`)
+- Backend: FastAPI, Python ASGI
+- Frontend: HTML, vanilla JavaScript, Tailwind CSS CDN, Material Symbols
+- Deployment: Vercel Python runtime using the root `app.py` entrypoint
 
----
+## Project Structure
 
-## 🚀 Local Setup & Verification
+```text
+.
+|-- app.py                  # FastAPI entrypoint used by Vercel and local dev
+|-- ai_service.py           # Gemini/OpenRouter provider logic
+|-- requirements.txt        # Runtime Python dependencies
+|-- api/templates/          # Static HTML dashboard pages
+|-- assets/                 # README/dashboard assets
+`-- .env.example            # Environment variable template
+```
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository_url>
-   cd TestGen-AI
-   ```
+## Local Setup
 
-2. **Install dependencies**:
+1. Install dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Configure Environment variables**:
-   Create a `.env` file in the root directory:
+2. Create a `.env` file in the project root:
+
    ```env
-   GEMINI_API_KEY=AIzaSy...
-   OPENROUTER_API_KEY=sk-or-v1-...
+   GEMINI_API_KEY=your_gemini_key
+   OPENROUTER_API_KEY=your_openrouter_key
    ```
 
-4. **Launch the development server**:
+3. Start the local server:
+
    ```bash
    python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload
    ```
-   Open `http://127.0.0.1:8000` in your web browser.
 
----
+4. Open:
 
-## ☁️ Vercel Deployment
+   ```text
+   http://127.0.0.1:8000
+   ```
 
-TestGen AI is ready for serverless deployment on Vercel:
-1. Link your repository in the Vercel Dashboard.
-2. In the project Settings, define your `GEMINI_API_KEY` and `OPENROUTER_API_KEY` environment variables.
-3. Deploy! Vercel's `@vercel/python` builder will automatically set up the FastAPI endpoints and serve the static layouts.
+## Vercel Deployment
+
+This project uses Vercel's FastAPI zero-config path. The root `app.py` file exposes the FastAPI instance as `app`, so no `vercel.json` is required.
+
+1. Push the repository to GitHub.
+2. Import the repository in Vercel.
+3. Add environment variables in Vercel Project Settings:
+   - `GEMINI_API_KEY`
+   - `OPENROUTER_API_KEY`
+4. Deploy.
+
+After deployment, hard refresh the site if the browser still shows an old OpenRouter model in the dropdown.
+
+## API
+
+### `GET /`
+
+Serves the main dashboard.
+
+### `GET /code`
+
+Serves the alternate generated-code page.
+
+### `POST /api/generate`
+
+Generates Pytest code.
+
+Request body:
+
+```json
+{
+  "project_context": "Describe the API or feature to test",
+  "model_choice": "gemini",
+  "model_name": "",
+  "test_type": "unit"
+}
+```
+
+Supported values:
+
+- `model_choice`: `gemini`, `openrouter`
+- `test_type`: `unit`, `integration`, `edge`
+
+Response body:
+
+```json
+{
+  "code": "def test_example():\n    assert True",
+  "elapsed": 1.23,
+  "test_count": 1
+}
+```
+
+## Notes
+
+- `.env` files are ignored by Git.
+- `.env.example` is intentionally tracked as a template.
+- If OpenRouter removes a model ID, the backend falls back to `qwen/qwen3-coder:free`.
